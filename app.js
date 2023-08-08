@@ -174,6 +174,7 @@ const todoValidationUpdate = (requestObject, responseObject, next) => {
       return;
     }
   }
+
   if (isValidQuery) {
     console.log("put request next handler");
     next();

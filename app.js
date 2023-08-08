@@ -79,6 +79,7 @@ const todoValidation = async (requestObject, responseObject, next) => {
       parsedDate = parse(date, "yyyy-M-dd", new Date());
       formattedDate = format(parsedDate, "yyyy-MM-dd");
     } catch (error) {
+      isValidQuery = false;
       responseObject.status(400);
       responseObject.send("Invalid Due Date");
       return;
@@ -104,17 +105,6 @@ const todoValidationCreate = (requestObject, responseObject, next) => {
   const requestObjectBody = requestObject.body;
   const { id, todo, priority, status, category, dueDate } = requestObjectBody;
   let isValidQuery = true;
-  /*
-  const possiblePriority = [`HIGH`, `MEDIUM`, `LOW`];
-  const possibleStatus = [`TO DO`, `IN PROGRESS`, `DONE`];
-  const possibleCategory = [`WORK`, `HOME`, `LEARNING`];
-  */
-  console.log(dueDate);
-  const parsedDate = parse(dueDate, "yyyy-MM-dd", new Date());
-  console.log(parsedDate); //2021-02-22T00:00:00.000Z
-  console.log(typeof parsedDate); //object
-  const formattedDate = format(parsedDate, "yyyy-MM-dd");
-
   if (status === undefined) {
     isValidQuery = false;
     responseObject.send("Invalid Todo Status");
@@ -130,54 +120,64 @@ const todoValidationCreate = (requestObject, responseObject, next) => {
     responseObject.send("Invalid Todo Category");
     return;
   }
-  if (dueDate === undefined) {
-    isValidQuery = false;
-    responseObject.send("Invalid Due Date");
-    return;
+
+  if (dueDate !== undefined) {
+    let parsedDate;
+    let formattedDate;
+    try {
+      parsedDate = parse(dueDate, "yyyy-MM-dd", new Date());
+      formattedDate = format(parsedDate, "yyyy-MM-dd");
+    } catch (error) {
+      isValidQuery = false;
+      responseObject.status(400);
+      responseObject.send("Invalid Due Date");
+      return;
+    }
   }
   if (isValidQuery) {
     console.log("post method next handler");
     next();
   }
+};
 
-  /*
-  
-  if (!possiblePriority.includes(priority) || typeof priority !== "string") {
-    isValidQuery = false;
-    responseObject.send("Invalid Todo Priority");
-    return;
-  }
-  if (!possibleStatus.includes(status) || typeof status !== "string") {
+const todoValidationUpdate = (requestObject, responseObject, next) => {
+  const todoIdObject = requestObject.params;
+  const { todoId } = todoIdObject;
+  const requestBody = requestObject.body;
+  const { status, priority, todo, category, dueDate } = requestBody;
+  let isValidQuery = true;
+  if (status !== undefined) {
     isValidQuery = false;
     responseObject.send("Invalid Todo Status");
     return;
   }
-  if (!possibleCategory.includes(category) || typeof status !== "string") {
+  if (priority !== undefined) {
+    isValidQuery = false;
+    responseObject.send("Invalid Todo Priority");
+    return;
+  }
+  if (category !== undefined) {
     isValidQuery = false;
     responseObject.send("Invalid Todo Category");
     return;
   }
-  if (typeof formattedDate !== "string") {
-    isValidQuery = false;
-    responseObject.send("Invalid Due Date");
-    return;
+  if (dueDate !== undefined) {
+    let parsedDate;
+    let formattedDate;
+    try {
+      parsedDate = parse(dueDate, "yyyy-MM-dd", new Date());
+      formattedDate = format(parsedDate, "yyyy-MM-dd");
+    } catch (error) {
+      isValidQuery = false;
+      responseObject.status(400);
+      responseObject.send("Invalid Due Date");
+      return;
+    }
   }
   if (isValidQuery) {
-    console.log("post method next handler");
+    console.log("put request next handler");
     next();
   }
-  /*
-  console.log(requestObjectBody);
-{
-  id: 6,
-  todo: 'Finalize event theme',
-  priority: 'LOW',
-  status: 'TO DO',
-  category: 'HOME',
-  dueDate: '2021-02-22'
-}
-
-  */
 };
 
 //API 1 scenarios:
@@ -428,7 +428,7 @@ const priorityScenario4 = (requestBody) => {
 };
 app.put(
   "/todos/:todoId/",
-  todoValidation,
+  todoValidationUpdate,
   async (requestObject, responseObject) => {
     let dbResponse = null;
     let sendingText = "";

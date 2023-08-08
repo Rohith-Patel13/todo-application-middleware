@@ -24,7 +24,7 @@ GET http://localhost:3001/todos/?search_q=Buy
 GET http://localhost:3001/todos/1/
 
 ### GET API 3:
-GET http://localhost:3001/agenda/?date=2021-12-12
+GET http://localhost:3001/agenda/?date=2021-4-02
 
 ### POST API 4:
 POST http://localhost:3001/todos/

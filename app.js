@@ -70,17 +70,21 @@ const todoValidation = async (requestObject, responseObject, next) => {
   }
 
   if (date !== undefined) {
-    console.log(date); //2021-2-22
-    console.log(typeof date); //string
-    const parsedDate = parse(date, "yyyy-M-dd", new Date());
-    console.log(parsedDate); //2021-02-22T00:00:00.000Z
-    console.log(typeof parsedDate); //object
-    const formattedDate = format(parsedDate, "yyyy-MM-dd");
-    console.log(formattedDate); //2021-02-22
-    console.log(typeof formattedDate); //string
-
-    const todoQuery = `SELECT * FROM todo WHERE due_date='${formattedDate}';`;
-    const dbResponse = await dbConnectionObject.all(todoQuery);
+    let parsedDate;
+    console.log(parsedDate); //undefined
+    let formattedDate;
+    console.log(formattedDate); //undefined
+    console.log(date);
+    try {
+      parsedDate = parse(date, "yyyy-M-dd", new Date());
+      formattedDate = format(parsedDate, "yyyy-MM-dd");
+    } catch (error) {
+      responseObject.status(400);
+      responseObject.send("Invalid Due Date");
+      return;
+    }
+    todoQuery = `SELECT * FROM todo WHERE due_date='${formattedDate}';`;
+    dbResponse = await dbConnectionObject.all(todoQuery);
     console.log(dbResponse.length);
     if (dbResponse.length === 0) {
       isValidQuery = false;
@@ -96,22 +100,48 @@ const todoValidation = async (requestObject, responseObject, next) => {
   }
 };
 
-const todoValidationCreate = async (requestObject, responseObject, next) => {
-  let todoQuery = "";
-  let dbResponse = null;
-
+const todoValidationCreate = (requestObject, responseObject, next) => {
   const requestObjectBody = requestObject.body;
-  const { priority, status, category, dueDate } = requestObjectBody;
+  const { id, todo, priority, status, category, dueDate } = requestObjectBody;
   let isValidQuery = true;
+  /*
   const possiblePriority = [`HIGH`, `MEDIUM`, `LOW`];
   const possibleStatus = [`TO DO`, `IN PROGRESS`, `DONE`];
   const possibleCategory = [`WORK`, `HOME`, `LEARNING`];
+  */
   console.log(dueDate);
   const parsedDate = parse(dueDate, "yyyy-MM-dd", new Date());
   console.log(parsedDate); //2021-02-22T00:00:00.000Z
   console.log(typeof parsedDate); //object
   const formattedDate = format(parsedDate, "yyyy-MM-dd");
 
+  if (status === undefined) {
+    isValidQuery = false;
+    responseObject.send("Invalid Todo Status");
+    return;
+  }
+  if (priority === undefined) {
+    isValidQuery = false;
+    responseObject.send("Invalid Todo Priority");
+    return;
+  }
+  if (category === undefined) {
+    isValidQuery = false;
+    responseObject.send("Invalid Todo Category");
+    return;
+  }
+  if (dueDate === undefined) {
+    isValidQuery = false;
+    responseObject.send("Invalid Due Date");
+    return;
+  }
+  if (isValidQuery) {
+    console.log("post method next handler");
+    next();
+  }
+
+  /*
+  
   if (!possiblePriority.includes(priority) || typeof priority !== "string") {
     isValidQuery = false;
     responseObject.send("Invalid Todo Priority");
@@ -146,8 +176,10 @@ const todoValidationCreate = async (requestObject, responseObject, next) => {
   category: 'HOME',
   dueDate: '2021-02-22'
 }
+
   */
 };
+
 //API 1 scenarios:
 const scenario1 = (requestObjectQuery) => {
   console.log("scenario1");

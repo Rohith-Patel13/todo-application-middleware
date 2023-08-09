@@ -145,22 +145,65 @@ const todoValidationUpdate = (requestObject, responseObject, next) => {
   const { todoId } = todoIdObject;
   const requestBody = requestObject.body;
   const { status, priority, todo, category, dueDate } = requestBody;
+  console.log(status);
+  console.log(priority);
+  console.log(todo);
+  console.log(category);
+  console.log(dueDate);
   let isValidQuery = true;
-  if (status !== undefined) {
-    isValidQuery = false;
-    responseObject.send("Invalid Todo Status");
-    return;
+  if (
+    status !== undefined &&
+    priority === undefined &&
+    todo === undefined &&
+    category === undefined &&
+    dueDate === undefined
+  ) {
+    if (typeof status !== "string") {
+      isValidQuery = false;
+      responseObject.send("Invalid Todo Status");
+      return;
+    }
   }
-  if (priority !== undefined) {
-    isValidQuery = false;
-    responseObject.send("Invalid Todo Priority");
-    return;
+  if (
+    status === undefined &&
+    priority !== undefined &&
+    todo === undefined &&
+    category === undefined &&
+    dueDate === undefined
+  ) {
+    if (typeof priority !== "string") {
+      isValidQuery = false;
+      responseObject.send("Invalid Todo Priority");
+      return;
+    }
   }
-  if (category !== undefined) {
-    isValidQuery = false;
-    responseObject.send("Invalid Todo Category");
-    return;
+  if (
+    status === undefined &&
+    priority === undefined &&
+    todo !== undefined &&
+    category === undefined &&
+    dueDate === undefined
+  ) {
+    if (typeof todo !== "string") {
+      isValidQuery = false;
+      responseObject.send("Invalid Todo");
+      return;
+    }
   }
+  if (
+    status === undefined &&
+    priority === undefined &&
+    todo === undefined &&
+    category !== undefined &&
+    dueDate === undefined
+  ) {
+    if (typeof category !== "string") {
+      isValidQuery = false;
+      responseObject.send("Invalid Todo Category");
+      return;
+    }
+  }
+
   if (dueDate !== undefined) {
     let parsedDate;
     let formattedDate;

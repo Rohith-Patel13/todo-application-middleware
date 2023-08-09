@@ -105,18 +105,22 @@ const todoValidationCreate = (requestObject, responseObject, next) => {
   const requestObjectBody = requestObject.body;
   const { id, todo, priority, status, category, dueDate } = requestObjectBody;
   let isValidQuery = true;
+
   if (status === undefined) {
     isValidQuery = false;
+    responseObject.status(400);
     responseObject.send("Invalid Todo Status");
     return;
   }
   if (priority === undefined) {
     isValidQuery = false;
+    responseObject.status(400);
     responseObject.send("Invalid Todo Priority");
     return;
   }
   if (category === undefined) {
     isValidQuery = false;
+    responseObject.status(400);
     responseObject.send("Invalid Todo Category");
     return;
   }
@@ -145,60 +149,54 @@ const todoValidationUpdate = (requestObject, responseObject, next) => {
   const { todoId } = todoIdObject;
   const requestBody = requestObject.body;
   const { status, priority, todo, category, dueDate } = requestBody;
-  console.log(status);
-  console.log(priority);
-  console.log(todo);
-  console.log(category);
-  console.log(dueDate);
+  console.log(typeof requestBody);
+  //console.log(requestBody.hasOwnProperty("status"));
+  //console.log(requestBody.hasOwnProperty("priority"));
+  //console.log(requestBody.hasOwnProperty("todo"));
+  console.log(requestBody.hasOwnProperty("category"));
+
   let isValidQuery = true;
   if (
-    status !== undefined &&
-    priority === undefined &&
-    todo === undefined &&
-    category === undefined &&
-    dueDate === undefined
+    requestBody.hasOwnProperty("status") ||
+    Object.keys(requestBody).length === 0
   ) {
-    if (typeof status !== "string") {
+    if (status === undefined || typeof status !== "string") {
       isValidQuery = false;
+      responseObject.status(400);
       responseObject.send("Invalid Todo Status");
       return;
     }
   }
   if (
-    status === undefined &&
-    priority !== undefined &&
-    todo === undefined &&
-    category === undefined &&
-    dueDate === undefined
+    requestBody.hasOwnProperty("priority") ||
+    Object.keys(requestBody).length === 0
   ) {
-    if (typeof priority !== "string") {
+    if (priority === undefined || typeof priority !== "string") {
       isValidQuery = false;
+      responseObject.status(400);
       responseObject.send("Invalid Todo Priority");
       return;
     }
   }
   if (
-    status === undefined &&
-    priority === undefined &&
-    todo !== undefined &&
-    category === undefined &&
-    dueDate === undefined
+    requestBody.hasOwnProperty("todo") ||
+    Object.keys(requestBody).length === 0
   ) {
-    if (typeof todo !== "string") {
+    if (todo === undefined || typeof todo !== "string") {
       isValidQuery = false;
+      responseObject.status(400);
       responseObject.send("Invalid Todo");
       return;
     }
   }
+
   if (
-    status === undefined &&
-    priority === undefined &&
-    todo === undefined &&
-    category !== undefined &&
-    dueDate === undefined
+    requestBody.hasOwnProperty("category") ||
+    Object.keys(requestBody).length === 0
   ) {
-    if (typeof category !== "string") {
+    if (category === undefined || typeof category !== "string") {
       isValidQuery = false;
+      responseObject.status(400);
       responseObject.send("Invalid Todo Category");
       return;
     }

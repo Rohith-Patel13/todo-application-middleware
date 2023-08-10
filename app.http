@@ -19,6 +19,8 @@ GET http://localhost:3001/todos/?category=LEARNING&priority=HIGH
 ### GET API 1 default scenario:
 GET http://localhost:3001/todos/?search_q=Buy
 
+### GET API 1 undefined scenario:
+GET http://localhost:3001/todos/
 
 ### GET API 2:
 GET http://localhost:3001/todos/1/
@@ -41,15 +43,15 @@ Content-Type: application/json
 
 
 ### API 5 scenario 1:
-PUT http://localhost:3001/todos/3/
+PUT http://localhost:3001/todos/5/
 Content-Type: application/json
 
 {
-    "status": undefined
-}
+    "status": "DONE"
+}s
 
 ### API 5 scenario 2:
-PUT http://localhost:3001/todos/3/
+PUT http://localhost:3001/todos/5/
 Content-Type: application/json
 
     {
@@ -57,7 +59,7 @@ Content-Type: application/json
     }
 
 ### API 5 scenario 3:
-PUT http://localhost:3001/todos/3/
+PUT http://localhost:3001/todos/5/
 Content-Type: application/json
 
     {
@@ -65,15 +67,15 @@ Content-Type: application/json
     }
 
 ### API 5 scenario 4:
-PUT http://localhost:3001/todos/3/
+PUT http://localhost:3001/todos/5/
 Content-Type: application/json
 
     {
-      "category": "LEARNING"
+      "category": "LEARNINGs"
     }
 
 ### API 5 scenario 5:
-PUT http://localhost:3001/todos/3/
+PUT http://localhost:3001/todos/5/
 Content-Type: application/json
 
      {

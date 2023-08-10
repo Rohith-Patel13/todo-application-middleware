@@ -104,25 +104,61 @@ const todoValidation = async (requestObject, responseObject, next) => {
 const todoValidationCreate = (requestObject, responseObject, next) => {
   const requestObjectBody = requestObject.body;
   const { id, todo, priority, status, category, dueDate } = requestObjectBody;
+  const priorityPossible = [`HIGH`, `MEDIUM`, `LOW`];
+  const statusPossible = [`TO DO`, `IN PROGRESS`, `DONE`];
+  const categoryPossible = [`WORK`, `HOME`, `LEARNING`];
   let isValidQuery = true;
 
-  if (status === undefined) {
-    isValidQuery = false;
-    responseObject.status(400);
-    responseObject.send("Invalid Todo Status");
-    return;
+  if (status !== undefined) {
+    if (typeof status !== "string") {
+      console.log("in if condition");
+      isValidQuery = false;
+      responseObject.status(400);
+      responseObject.send("Invalid Todo Status");
+      return;
+    } else if (typeof status === "string") {
+      if (!statusPossible.includes(status)) {
+        isValidQuery = false;
+        responseObject.status(400);
+        responseObject.send("Invalid Todo Status");
+        return;
+      }
+    }
   }
-  if (priority === undefined) {
-    isValidQuery = false;
-    responseObject.status(400);
-    responseObject.send("Invalid Todo Priority");
-    return;
+
+  if (priority !== undefined) {
+    if (typeof priority !== "string") {
+      console.log("in if condition");
+      isValidQuery = false;
+      responseObject.status(400);
+      responseObject.send("Invalid Todo Priority");
+      return;
+    } else if (typeof priority === "string") {
+      if (!priorityPossible.includes(priority)) {
+        isValidQuery = false;
+        responseObject.status(400);
+        responseObject.send("Invalid Todo Priority");
+        return;
+      }
+    }
   }
-  if (category === undefined) {
-    isValidQuery = false;
-    responseObject.status(400);
-    responseObject.send("Invalid Todo Category");
-    return;
+  if (category !== undefined) {
+    if (typeof category !== "string") {
+      console.log("in if condition");
+      isValidQuery = false;
+      responseObject.status(400);
+      responseObject.send("Invalid Todo Category");
+      return;
+    } else if (typeof category === "string") {
+      console.log("in else if");
+      if (!categoryPossible.includes(category)) {
+        console.log("in esle if if");
+        isValidQuery = false;
+        responseObject.status(400);
+        responseObject.send("Invalid Todo Category");
+        return;
+      }
+    }
   }
 
   if (dueDate !== undefined) {
@@ -144,61 +180,114 @@ const todoValidationCreate = (requestObject, responseObject, next) => {
   }
 };
 
-const todoValidationUpdate = (requestObject, responseObject, next) => {
+const todoValidationUpdate = async (requestObject, responseObject, next) => {
+  let todoQuery = "";
+  let dbResponse = null;
   const todoIdObject = requestObject.params;
   const { todoId } = todoIdObject;
   const requestBody = requestObject.body;
   const { status, priority, todo, category, dueDate } = requestBody;
-  console.log(typeof requestBody);
-  //console.log(requestBody.hasOwnProperty("status"));
-  //console.log(requestBody.hasOwnProperty("priority"));
-  //console.log(requestBody.hasOwnProperty("todo"));
-  console.log(requestBody.hasOwnProperty("category"));
-
+  const priorityPossible = [`HIGH`, `MEDIUM`, `LOW`];
+  const statusPossible = [`TO DO`, `IN PROGRESS`, `DONE`];
+  const categoryPossible = [`WORK`, `HOME`, `LEARNING`];
   let isValidQuery = true;
-  if (
-    requestBody.hasOwnProperty("status") ||
-    Object.keys(requestBody).length === 0
-  ) {
-    if (status === undefined || typeof status !== "string") {
+  if (status !== undefined) {
+    if (typeof status !== "string") {
+      console.log("in if condition");
       isValidQuery = false;
       responseObject.status(400);
       responseObject.send("Invalid Todo Status");
       return;
+    } else if (typeof status === "string") {
+      if (!statusPossible.includes(status)) {
+        isValidQuery = false;
+        responseObject.status(400);
+        responseObject.send("Invalid Todo Status");
+        return;
+      } else {
+        console.log("in else if condition");
+        todoQuery = `SELECT * FROM todo WHERE id=${todoId} AND status='${status}';`;
+        dbResponse = await dbConnectionObject.all(todoQuery);
+        console.log(dbResponse); //should get []
+        console.log(dbResponse.length); //should get 0
+        if (dbResponse.length === 1) {
+          isValidQuery = false;
+          responseObject.status(400);
+          responseObject.send("Invalid Todo Status");
+          return;
+        }
+      }
     }
   }
-  if (
-    requestBody.hasOwnProperty("priority") ||
-    Object.keys(requestBody).length === 0
-  ) {
-    if (priority === undefined || typeof priority !== "string") {
+  if (priority !== undefined) {
+    if (typeof priority !== "string") {
       isValidQuery = false;
       responseObject.status(400);
       responseObject.send("Invalid Todo Priority");
       return;
+    } else if (typeof priority === "string") {
+      if (!priorityPossible.includes(priority)) {
+        isValidQuery = false;
+        responseObject.status(400);
+        responseObject.send("Invalid Todo Priority");
+        return;
+      } else {
+        todoQuery = `SELECT * FROM todo WHERE id=${todoId} AND priority='${priority}';`;
+        dbResponse = await dbConnectionObject.all(todoQuery);
+        console.log(dbResponse); //should get []
+        console.log(dbResponse.length); //should get 0
+        if (dbResponse.length === 1) {
+          isValidQuery = false;
+          responseObject.status(400);
+          responseObject.send("Invalid Todo Priority");
+          return;
+        }
+      }
     }
   }
-  if (
-    requestBody.hasOwnProperty("todo") ||
-    Object.keys(requestBody).length === 0
-  ) {
-    if (todo === undefined || typeof todo !== "string") {
-      isValidQuery = false;
-      responseObject.status(400);
-      responseObject.send("Invalid Todo");
-      return;
-    }
-  }
-
-  if (
-    requestBody.hasOwnProperty("category") ||
-    Object.keys(requestBody).length === 0
-  ) {
-    if (category === undefined || typeof category !== "string") {
+  if (category !== undefined) {
+    if (typeof category !== "string") {
       isValidQuery = false;
       responseObject.status(400);
       responseObject.send("Invalid Todo Category");
       return;
+    } else if (typeof category === "string") {
+      if (!categoryPossible.includes(category)) {
+        isValidQuery = false;
+        responseObject.status(400);
+        responseObject.send("Invalid Todo Category");
+        return;
+      } else {
+        todoQuery = `SELECT * FROM todo WHERE id=${todoId} AND category='${category}';`;
+        dbResponse = await dbConnectionObject.all(todoQuery);
+        console.log(dbResponse); //should get []
+        console.log(dbResponse.length); //should get 0
+        if (dbResponse.length === 1) {
+          isValidQuery = false;
+          responseObject.status(400);
+          responseObject.send("Invalid Todo Category");
+          return;
+        }
+      }
+    }
+  }
+  if (todo !== undefined) {
+    if (typeof todo !== "string") {
+      isValidQuery = false;
+      responseObject.status(400);
+      responseObject.send("Invalid todo");
+      return;
+    } else if (typeof todo === "string") {
+      todoQuery = `SELECT * FROM todo WHERE id=${todoId} AND todo='${todo}';`;
+      dbResponse = await dbConnectionObject.all(todoQuery);
+      console.log(dbResponse); //should get []
+      console.log(dbResponse.length); //should get 0
+      if (dbResponse.length === 1) {
+        isValidQuery = false;
+        responseObject.status(400);
+        responseObject.send("Invalid todo");
+        return;
+      }
     }
   }
 
